@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bees AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Nunito','Segoe UI',sans-serif;background:linear-gradient(125deg,#050f33,#0d3590,#0a2570,#1b5be0);background-size:300% 300%;animation:bg 16s ease infinite;color:#fff}
+h1,h2,h3,h4,.fd{font-family:'Baloo 2','Nunito',sans-serif}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;position:relative;overflow:hidden}
+button:focus-visible{outline:2px solid #9fd0ff;outline-offset:2px}
+.bub{position:fixed;z-index:-1;bottom:-80px;border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.35),rgba(255,255,255,.04));animation:rise linear infinite;pointer-events:none}
+#app{--b1:#0a2161;--b2:#1648b8;--tx:#fff;--mu:#a9c2f2;--cd:rgba(255,255,255,.09);--ln:rgba(255,255,255,.14);--ac:#4d8dff;--bu:rgba(255,255,255,.12);--dr:rgba(14,40,110,.93);--pt:calc(env(safe-area-inset-top,0px) + 14px);position:absolute;left:50%;top:0;width:min(100%,480px);height:100%;transform:translateX(-50%);overflow:hidden;background:linear-gradient(165deg,var(--b1),var(--b2));color:var(--tx);box-shadow:0 0 90px #3d7bff66}
+#app.light{--b1:#f0f6ff;--b2:#cfe2ff;--tx:#12307a;--mu:#5b78b8;--cd:rgba(255,255,255,.8);--ln:rgba(40,90,200,.16);--bu:#fff;--dr:rgba(244,249,255,.95)}
+.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+[data-bot] svg{width:100%;height:100%;display:block;overflow:visible}
+.wl,.wr,.ey{transform-box:fill-box}
+.wl{transform-origin:100% 50%;animation:wing .35s ease-in-out infinite alternate}
+.wr{transform-origin:0 50%;animation:wing2 .35s ease-in-out infinite alternate}
+.ey{transform-origin:center;animation:blink 4.5s infinite}
+.scr{position:absolute;inset:0;display:flex;flex-direction:column;padding-top:var(--pt);opacity:0;pointer-events:none;transform:scale(.96) translateY(14px);transition:opacity .5s,transform .6s cubic-bezier(.2,.8,.2,1)}
+.scr.on{opacity:1;pointer-events:auto;transform:none}
+.scr.on .st{animation:up .65s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*70ms)}
+#splash{align-items:center;justify-content:center;text-align:center;padding:var(--pt) 28px 110px}
+.wv{position:absolute;left:-60%;bottom:-62%;width:220%;height:80%;border-radius:42%;background:rgba(90,150,255,.16);animation:spin 22s linear infinite}
+.wv.b{bottom:-72%;background:rgba(40,100,230,.24);animation-duration:30s;animation-direction:reverse}
+.sp{position:absolute;color:#cfe5ff;font-size:18px;animation:tw 2.8s ease-in-out infinite}
+.hb{position:relative;width:230px;height:230px;display:grid;place-items:center}
+.hv{width:170px;height:170px;position:relative;animation:fly 3.6s ease-in-out infinite;filter:drop-shadow(0 14px 30px #4d8dffaa)}
+.orb{position:absolute;inset:-26px;transform:rotate(-18deg) scaleY(.4)}
+.orb i{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(170,205,255,.45);animation:spin 8s linear infinite}
+.orb i::after{content:"";position:absolute;top:-7px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:#aee0ff;box-shadow:0 0 18px 4px #7fc4ff}
+.ttl{font-size:58px;font-weight:800;line-height:1.1;margin-top:8px;background:linear-gradient(180deg,#fff,#9fc6ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+#app.light .ttl{background:linear-gradient(180deg,#1f55d8,#4d8dff);-webkit-background-clip:text;background-clip:text}
+.tg{color:var(--mu);font-size:16px;font-weight:600}
+.bt{position:absolute;left:32px;right:32px;bottom:44px}
+.cta{width:100%;padding:16px;border-radius:30px;background:linear-gradient(180deg,#fff,#cfe2ff);color:#1f4fc4;font:700 19px 'Baloo 2',sans-serif;box-shadow:0 12px 30px #0a1f6a88,0 0 0 4px #ffffff22;transition:.25s}
+.cta:active{transform:scale(.96)}
+.cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,#fffa,transparent);transform:skewX(-20deg);animation:shine 3.2s infinite}
+.dt{display:flex;justify-content:center;gap:8px;margin-top:20px}
+.dt i{width:7px;height:7px;border-radius:50%;background:#fff5;animation:dot 3s infinite}
+.dt i:nth-child(2){animation-delay:1s}.dt i:nth-child(3){animation-delay:2s}
+.hd{display:flex;align-items:center;gap:10px;padding:8px 20px 12px}
+.hd h1{flex:1;font-size:25px;font-weight:700}
+.lg{width:38px;height:38px;flex:none;overflow:visible}
+.ib{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;background:var(--cd);border:1px solid var(--ln);backdrop-filter:blur(8px);transition:.2s}
+.ib:active{transform:scale(.88)}
+.ib.ac{background:var(--ac);border-color:transparent;color:#fff;box-shadow:0 6px 18px #4d8dff88}
+.bd{flex:1;overflow-y:auto;padding:4px 20px 110px;scrollbar-width:none}
+.hero{display:flex;align-items:center;justify-content:space-between;padding:20px;border-radius:26px;background:linear-gradient(135deg,rgba(90,150,255,.45),rgba(60,110,230,.18));border:1px solid var(--ln);overflow:hidden}
+.hero h2{font-size:26px;font-weight:700;line-height:1.2}
+.hero p{font-size:13.5px;color:var(--mu);max-width:170px;margin-top:6px;line-height:1.5}
+.hero .fl{width:108px;height:108px;flex:none;animation:fly 3.4s ease-in-out infinite;filter:drop-shadow(0 8px 16px #4d8dff88)}
+h3{font-size:17px;font-weight:600;margin:22px 0 12px;display:flex;justify-content:space-between;align-items:center}
+h3 .i{width:18px;height:18px}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sc{height:96px;padding:12px;border-radius:20px;background:var(--cd);border:1px solid var(--ln);text-align:left;display:flex;flex-direction:column;justify-content:space-between;font-size:13.5px;font-weight:700;line-height:1.25;transition:.3s cubic-bezier(.2,.8,.2,1)}
+.sc:hover{transform:translateY(-4px);box-shadow:0 12px 24px #0a1f6a55}
+.sc .ic{width:32px;height:32px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,#7dbcff,#3d6fe8);color:#fff}
+.sc .i{width:17px;height:17px}
+.cv{display:flex;align-items:center;gap:12px;padding:12px;border-radius:20px;width:100%;text-align:left;transition:.25s}
+.cv:hover,.cv:active{background:var(--cd)}
+.av{width:46px;height:46px;border-radius:50%;flex:none;display:grid;place-items:center;background:linear-gradient(135deg,#fff,#cfe0ff);color:#2457d6}
+.cv .tx{flex:1;min-width:0}
+.cv b{display:flex;justify-content:space-between;font-size:14.5px}
+.cv small{font-weight:600;font-size:12px;color:var(--mu)}
+.cv p{font-size:13px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.tab{position:absolute;left:14px;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;padding:7px;border-radius:32px;background:rgba(238,245,255,.96);box-shadow:0 12px 32px #0007}
+.tab button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:25px;font-size:11.5px;font-weight:800;color:#7d94c8;transition:.3s}
+.tab button.on{color:#1f5fe0;background:#d9e7ff}
+.tab button:active .i{animation:pop .4s}
+.ch{display:flex;align-items:center;gap:10px;padding:6px 16px 12px;border-bottom:1px solid var(--ln)}
+.p{width:40px;height:40px;flex:none}
+.ch .t{flex:1;line-height:1.15}
+.ch b{font:700 17px 'Baloo 2',sans-serif;display:block}
+.ch small{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#3ddc97}
+.ch small::before{content:"";width:7px;height:7px;border-radius:50%;background:#3ddc97;animation:pulse 1.6s infinite}
+#msgs{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:14px;scrollbar-width:none}
+.m{display:flex;gap:10px;align-items:flex-end;max-width:88%;animation:pop .5s cubic-bezier(.2,.9,.3,1.3) both}
+.m.me{align-self:flex-end}
+.a{width:34px;height:34px;flex:none}
+.bb{padding:12px 16px;border-radius:20px 20px 20px 6px;background:var(--bu);border:1px solid var(--ln);font-size:14.5px;line-height:1.55;white-space:pre-wrap;word-break:break-word}
+.me .bb{background:linear-gradient(135deg,#3b82ff,#1f55d8);color:#fff;border:0;border-radius:20px 20px 6px 20px;box-shadow:0 8px 18px #1f55d855}
+.tm{font-size:11px;color:var(--mu);margin:4px 6px 0}
+.me .tm{text-align:right}
+.bb.dots{display:flex;gap:5px;padding:16px 18px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--mu);animation:bn 1.2s infinite}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+.cp{display:flex;align-items:flex-end;gap:10px;margin:8px 14px calc(14px + env(safe-area-inset-bottom,0px));padding:7px;border-radius:30px;background:var(--cd);border:1px solid var(--ln);backdrop-filter:blur(10px)}
+.cp textarea{flex:1;background:none;border:0;outline:0;resize:none;color:inherit;font:inherit;font-size:14.5px;line-height:1.4;padding:10px 2px;max-height:110px}
+.cp textarea::placeholder{color:var(--mu)}
+.cp .ib.ac:hover{transform:rotate(-12deg) scale(1.08)}
+.dim{position:absolute;inset:0;z-index:20;background:#02082066;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:.4s}
+.dim.on{opacity:1;pointer-events:auto}
+#dr{position:absolute;top:0;bottom:0;left:0;width:84%;z-index:30;padding:var(--pt) 16px 20px;background:var(--dr);backdrop-filter:blur(24px);border-radius:0 32px 32px 0;display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:none;transform:translateX(-104%);transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+#dr.on{transform:none}
+#dr.on>*{animation:up .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*45ms)}
+.dh{display:flex;align-items:center;gap:12px;padding:6px 8px 18px}
+.dv{width:62px;height:62px;flex:none}
+.dh b{font:700 20px 'Baloo 2',sans-serif;display:block;line-height:1.1}
+.dh small{font-size:12.5px;color:var(--mu)}
+.it{display:flex;align-items:center;gap:14px;width:100%;padding:13px 14px;border-radius:18px;font-weight:700;font-size:14.5px;text-align:left;transition:.25s;flex:none}
+.it:hover{background:var(--cd);transform:translateX(4px)}
+.it.on{background:linear-gradient(90deg,#fffffff2,#cfe0fff2);color:#1f4fc4;box-shadow:0 8px 20px #0a1f6a44}
+.lb{font-size:12.5px;font-weight:700;color:var(--mu);margin:16px 14px 6px;flex:none}
+.it.dk{margin-top:auto;background:var(--cd);border:1px solid var(--ln)}
+.sw{margin-left:auto;width:48px;height:28px;border-radius:20px;background:var(--ln);position:relative;transition:.3s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.35s cubic-bezier(.3,1.6,.5,1)}
+.sw.on{background:var(--ac)}.sw.on::after{transform:translateX(20px)}
+.sh{position:absolute;left:0;right:0;bottom:0;z-index:30;padding:30px 26px calc(28px + env(safe-area-inset-bottom,0px));border-radius:34px 34px 0 0;background:var(--dr);backdrop-filter:blur(24px);text-align:center;transform:translateY(105%);transition:transform .65s cubic-bezier(.2,.9,.3,1.1)}
+.sh.on{transform:none}
+.sh .sv{width:84px;height:84px;margin:-76px auto 6px;animation:fly 3s ease-in-out infinite;filter:drop-shadow(0 8px 16px #4d8dff99)}
+.sh h2{font-size:24px;font-weight:700}
+.sh p{font-size:14px;color:var(--mu);margin:4px 0 20px;line-height:1.5}
+.sh small{display:block;font-size:11.5px;color:var(--mu);margin-top:14px;line-height:1.5}
+.gb{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:15px;border-radius:30px;background:#fff;color:#2b3a5c;font-weight:800;font-size:16px;box-shadow:0 10px 26px #0004;transition:.25s}
+.gb:active{transform:scale(.96)}
+.gb svg{width:22px;height:22px}
+.ov{position:absolute;inset:0;z-index:50;display:grid;place-items:center;background:#02082099;backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:.35s}
+.ov.on{opacity:1;pointer-events:auto}
+.gc{width:84%;background:#fff;color:#202124;border-radius:28px;padding:26px 0 8px;transform:scale(.88) translateY(20px);transition:.5s cubic-bezier(.2,.9,.3,1.2);text-align:center}
+.ov.on .gc{transform:none}
+.gc svg{width:28px;height:28px}
+.gc h4{font-weight:600;font-size:22px;margin-top:6px}
+.gc p{font-size:13.5px;color:#5f6368;margin:2px 0 16px}
+.ar{display:flex;align-items:center;gap:14px;width:100%;padding:12px 22px;text-align:left;border-top:1px solid #eceff4;transition:.2s}
+.ar:hover{background:#eef4ff}
+.ar>i{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-style:normal;font-weight:800;flex:none}
+.ar b{display:block;font-size:14.5px}
+.ar small{color:#5f6368;font-size:12.5px}
+.cx{width:100%;padding:14px;border-top:1px solid #eceff4;color:#1a73e8;font-weight:800;font-size:14px}
+.ld{text-align:center;font-weight:700}
+.ld i{display:block;width:46px;height:46px;margin:0 auto 14px;border-radius:50%;border:4px solid #ffffff44;border-top-color:#fff;animation:spin .8s linear infinite}
+#ts{position:absolute;left:50%;bottom:104px;z-index:60;transform:translate(-50%,20px);padding:10px 18px;border-radius:22px;background:#fff;color:#1f4fc4;font-weight:800;font-size:13.5px;white-space:nowrap;opacity:0;pointer-events:none;transition:.4s cubic-bezier(.2,.9,.3,1.2)}
+#ts.on{opacity:1;transform:translate(-50%,0)}
+.rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.4);transform:scale(0);animation:rp .6s ease-out forwards;pointer-events:none}
+.bb.cur::after{content:"";display:inline-block;width:2px;height:1.05em;margin-left:2px;vertical-align:-2px;background:currentColor;animation:cb .7s steps(2) infinite}
+.gs{display:block;width:100%;margin-top:6px;padding:13px;border-radius:26px;color:var(--mu);font-weight:800;font-size:14.5px;transition:.25s}
+.gs:hover{background:var(--cd);color:var(--tx)}
+.gn{display:none;align-items:center;gap:10px;padding:10px 14px;border-radius:16px;background:rgba(255,196,60,.14);border:1px solid rgba(255,196,60,.45);color:#ffd36b;font-size:12.5px;font-weight:700;line-height:1.45}
+#app.light .gn{color:#8a5a00}
+#app.guest .gn{display:flex}
+#app.guest .rc{display:none}
+.gn.hm{margin-top:22px}
+.gn.ct{margin:10px 16px 0}
+.gc .w{padding:0 26px}
+.wi{font-size:38px;line-height:1}
+.cx.g{color:#5f6368}
+@keyframes cb{50%{opacity:0}}
+@keyframes bg{50%{background-position:100% 100%}}
+@keyframes rise{from{opacity:.9}to{transform:translate(30px,-120vh);opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fly{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-12px) rotate(2deg)}}
+@keyframes up{from{opacity:0;transform:translateY(22px)}}
+@keyframes pop{from{opacity:0;transform:scale(.7) translateY(14px)}}
+@keyframes bn{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-6px);opacity:1}}
+@keyframes pulse{50%{box-shadow:0 0 0 6px #3ddc9733}}
+@keyframes tw{0%,100%{opacity:.2;transform:scale(.7) rotate(0)}50%{opacity:1;transform:scale(1.2) rotate(30deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.1)}}
+@keyframes wing{to{transform:rotate(14deg)}}
+@keyframes wing2{to{transform:rotate(-14deg)}}
+@keyframes shine{to{left:130%}}
+@keyframes dot{0%,30%{background:#fff;transform:scale(1.35)}40%,100%{background:#fff5;transform:none}}
+@keyframes rp{to{transform:scale(1);opacity:0}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+<defs>
+<linearGradient id="gw" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset="1" stop-color="#8ec0ff" stop-opacity=".55"/></linearGradient>
+<radialGradient id="gh" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#bcd6ff"/></radialGradient>
+<linearGradient id="gv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a45b8"/><stop offset="1" stop-color="#0a1757"/></linearGradient>
+</defs>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z"/></symbol>
+<symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16.2 7.8l-2.1 6.3-6.3 2.1 2.1-6.3z"/></symbol>
+<symbol id="i-set" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></symbol>
+<symbol id="i-dots" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+<symbol id="i-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+<symbol id="i-next" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8-6.2-3.3-6.2 3.3L7 14.2 2 9.3l6.9-1z"/></symbol>
+</svg>
+
+<main id="app">
+<section class="scr" id="splash">
+<div class="wv"></div><div class="wv b"></div>
+<b class="sp" style="top:21%;left:16%">✦</b><b class="sp" style="top:30%;right:12%;animation-delay:.8s">✦</b><b class="sp" style="top:46%;left:9%;animation-delay:1.6s;font-size:12px">✦</b><b class="sp" style="top:16%;right:27%;animation-delay:2.2s;font-size:11px">✦</b>
+<div class="hb st"><div class="orb"><i></i></div><span class="hv" data-bot></span></div>
+<h1 class="ttl st">Bees AI</h1>
+<p class="tg st">Luôn ở đây, lắng nghe bạn</p>
+<div class="bt st"><button class="cta" id="go">Bắt đầu</button><div class="dt"><i></i><i></i><i></i></div></div>
+</section>
+
+<section class="scr" id="home">
+<header class="hd st"><button class="lg" id="menu" data-bot></button><h1>Bees AI</h1><button class="ib" data-soon><svg class="i"><use href="#i-search"/></svg></button><button class="ib ac" id="new"><svg class="i"><use href="#i-plus"/></svg></button></header>
+<div class="bd">
+<div class="hero st"><div><h2 id="hi">Chào bạn!</h2><p>Mình là Bees AI, rất vui được trò chuyện cùng bạn.</p></div><span class="fl" data-bot></span></div>
+<h3 class="st">Gợi ý hôm nay</h3>
+<div class="sg st" id="sg"></div>
+<h3 class="st rc">Cuộc trò chuyện gần đây <svg class="i"><use href="#i-next"/></svg></h3>
+<div class="st rc" id="list"></div>
+<div class="gn hm st"><span>⚠️</span>Chế độ khách: cuộc trò chuyện sẽ không được lưu và không có lịch sử.</div>
+</div>
+<nav class="tab">
+<button class="on" data-t="chat"><svg class="i"><use href="#i-chat"/></svg>Trò chuyện</button>
+<button data-t="soon"><svg class="i"><use href="#i-compass"/></svg>Khám phá</button>
+<button data-t="me"><svg class="i"><use href="#i-user"/></svg>Cá nhân</button>
+</nav>
+</section>
+
+<section class="scr" id="chat">
+<div class="ch"><button class="ib" id="bk"><svg class="i"><use href="#i-back"/></svg></button><span class="p" data-bot></span><div class="t"><b>Bees AI</b><small>Đang hoạt động</small></div><button class="ib" data-soon><svg class="i"><use href="#i-search"/></svg></button><button class="ib" data-soon><svg class="i"><use href="#i-dots"/></svg></button></div>
+<div class="gn ct"><span>⚠️</span>Chế độ khách: tin nhắn sẽ mất khi bạn thoát.</div>
+<div id="msgs"></div>
+<div class="cp"><button class="ib" data-soon><svg class="i"><use href="#i-plus"/></svg></button><textarea id="in" rows="1" placeholder="Nhập tin nhắn…"></textarea><button class="ib ac" id="sn"><svg class="i"><use href="#i-send"/></svg></button></div>
+</section>
+
+<div class="dim" id="dim"></div>
+
+<aside id="dr">
+<div class="dh"><span class="dv" data-bot></span><div><b>Bees AI</b><small id="un">Luôn ở đây, lắng nghe bạn</small></div></div>
+<button class="it on" data-a="home"><svg class="i"><use href="#i-home"/></svg>Trang chủ</button>
+<button class="it" data-a="chat"><svg class="i"><use href="#i-chat"/></svg>Trò chuyện</button>
+<button class="it" data-a="x"><svg class="i"><use href="#i-compass"/></svg>Khám phá</button>
+<button class="it" data-a="x"><svg class="i"><use href="#i-set"/></svg>Cài đặt</button>
+<div class="lb">Tài khoản</div>
+<button class="it" data-a="x"><svg class="i"><use href="#i-user"/></svg>Hồ sơ</button>
+<button class="it" data-a="x"><svg class="i"><use href="#i-shield"/></svg>Dữ liệu &amp; quyền riêng tư</button>
+<button class="it" data-a="x"><svg class="i"><use href="#i-bell"/></svg>Thông báo</button>
+<div class="lb">Khác</div>
+<button class="it" data-a="x"><svg class="i"><use href="#i-help"/></svg>Trợ giúp</button>
+<button class="it" data-a="x"><svg class="i"><use href="#i-info"/></svg>Về Bees AI</button>
+<button class="it" data-a="out"><svg class="i"><use href="#i-out"/></svg><span id="ot">Đăng xuất</span></button>
+<button class="it dk" id="dk"><svg class="i"><use href="#i-moon"/></svg>Giao diện tối<span class="sw on"></span></button>
+</aside>
+
+<div class="sh" id="sh">
+<span class="sv" data-bot></span>
+<h2>Chào mừng đến Bees AI</h2>
+<p>Đăng nhập để Bees nhớ bạn và luôn sẵn sàng lắng nghe nhé.</p>
+<button class="gb" id="gg"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.5 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.2 5.4-4.7 7.1l7.6 5.9c4.4-4.1 6.9-10.1 6.9-17.5z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>Đăng nhập với Google</button>
+<button class="gs" id="gu">Trải nghiệm mà không cần đăng nhập</button>
+<small>Bằng việc tiếp tục, bạn đồng ý với Điều khoản và Chính sách quyền riêng tư của Bees AI.</small>
+</div>
+
+<div class="ov" id="gm"><div class="gc">
+<svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.5 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.2 5.4-4.7 7.1l7.6 5.9c4.4-4.1 6.9-10.1 6.9-17.5z"/><path fill="#FBBC05" d="M10.5 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7l-7.9-6.1A24 24 0 0 0 0 24c0 3.9.9 7.5 2.6 10.8l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.6-5.9c-2.1 1.4-4.9 2.3-8.3 2.3-6.3 0-11.6-4-13.5-9.8l-7.9 6.1C6.5 42.6 14.6 48 24 48z"/></svg>
+<h4>Chọn tài khoản</h4><p>để tiếp tục tới Bees AI</p>
+<div id="al"></div>
+<button class="cx" id="cx">Hủy</button>
+</div></div>
+
+<div class="ov" id="wn"><div class="gc">
+<div class="wi">⚠️</div>
+<h4>Chế độ khách</h4>
+<p class="w">Nếu không đăng nhập, cuộc trò chuyện sẽ không được lưu và không có lịch sử chat. Nội dung sẽ mất khi bạn thoát hoặc tải lại trang.</p>
+<button class="cx" id="wc">Tiếp tục dùng thử</button>
+<button class="cx g" id="wb">Quay lại đăng nhập</button>
+</div></div>
+
+<div class="ov ld" id="ld"><div><i></i>Đang đăng nhập…</div></div>
+<div id="ts"></div>
+</main>
+
+<script>
+const GOOGLE_CLIENT_ID="";
+
+const Login=(()=>{
+  const q=s=>document.querySelector(s);
+  const demo=[["Minh Anh","minhanh.nguyen@gmail.com","#e8710a"],["Gia Bảo","giabao.tran@gmail.com","#1a73e8"],["Thu Hà","thuha.le@gmail.com","#188038"]];
+  let client=null,token=null,pending=null;
+
+  function chooser(){
+    return new Promise((ok,no)=>{
+      const gm=q("#gm"),close=()=>gm.classList.remove("on");
+      q("#sh").classList.remove("on");
+      q("#dim").classList.remove("on");
+      q("#al").innerHTML=demo.map((a,i)=>`<button class="ar" data-i="${i}"><i style="background:${a[2]}">${a[0].split(" ").pop()[0]}</i><span><b>${a[0]}</b><small>${a[1]}</small></span></button>`).join("");
+      q("#al").onclick=e=>{
+        const b=e.target.closest(".ar");
+        if(!b)return;
+        const a=demo[b.dataset.i];
+        close();
+        ok({name:a[0],email:a[1],picture:""});
+      };
+      q("#cx").onclick=()=>{close();no(new Error("cancel"))};
+      gm.onclick=e=>{if(e.target===gm){close();no(new Error("cancel"))}};
+      setTimeout(()=>gm.classList.add("on"),250);
+    });
+  }
+
+  function loadGsi(){
+    return new Promise((ok,no)=>{
+      if(window.google&&google.accounts)return ok();
+      const s=document.createElement("script");
+      s.src="https://accounts.google.com/gsi/client";
+      s.async=true;
+      s.onload=ok;
+      s.onerror=()=>no(new Error("gsi"));
+      document.head.append(s);
+    });
+  }
+
+  function setup(){
+    return loadGsi().then(()=>{
+      client=google.accounts.oauth2.initTokenClient({
+        client_id:GOOGLE_CLIENT_ID,
+        scope:"openid email profile",
+        callback:r=>{if(pending)r.error?pending.no(new Error(r.error)):pending.ok(r)},
+        error_callback:e=>{if(pending)pending.no(new Error(e.type||"popup"))}
+      });
+    });
+  }
+
+  function real(){
+    return new Promise((ok,no)=>{
+      if(!client)return no(new Error("not ready"));
+      pending={ok,no};
+      client.requestAccessToken({prompt:"select_account"});
+    })
+    .then(r=>{
+      token=r.access_token;
+      return fetch("https://www.googleapis.com/oauth2/v3/userinfo",{headers:{Authorization:"Bearer "+token}});
+    })
+    .then(r=>r.json())
+    .then(u=>({name:u.name,email:u.email,picture:u.picture}));
+  }
+
+  if(GOOGLE_CLIENT_ID)setup().catch(e=>console.error(e));
+
+  return{
+    signIn:()=>GOOGLE_CLIENT_ID?real():chooser(),
+    signOut(){
+      if(token&&window.google){google.accounts.oauth2.revoke(token,()=>{});token=null}
+    }
+  };
+})();
+
+</script>
+<script>
+const GEMINI_API_KEY="";
+const GEMINI_MODEL="gemini-2.5-flash";
+const COLAB_URL="";
+const SYSTEM_PROMPT="Bạn là Bees AI, một người bạn AI dịu dàng và biết lắng nghe. Hãy xưng \"tớ\" và gọi người dùng là \"bạn\". Trả lời bằng tiếng Việt, ngắn gọn, ấm áp, không phán xét.";
+
+const AI=(()=>{
+  let hist=[];
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  const demo=["Tớ nghe đây 💙 Bạn kể thêm cho tớ nghe được không?","Cảm ơn bạn đã chia sẻ nhé. Từng chút một thôi, không cần vội đâu.","Nghe có vẻ không dễ dàng chút nào. Tớ ở đây cùng bạn nè 🐝","Bạn đã làm tốt lắm rồi đó. Muốn tớ gợi ý vài việc nhỏ để thấy nhẹ nhõm hơn không?","Hít một hơi thật sâu cùng tớ nào… vào… rồi thở ra… 🌿"];
+
+  async function gemini(){
+    const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,{
+      method:"POST",
+      headers:{"Content-Type":"application/json","x-goog-api-key":GEMINI_API_KEY},
+      body:JSON.stringify({
+        system_instruction:{parts:[{text:SYSTEM_PROMPT}]},
+        contents:hist.map(m=>({role:m[0]=="user"?"user":"model",parts:[{text:m[1]}]}))
+      })
+    });
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error?.message||r.status);
+    return d.candidates[0].content.parts.map(p=>p.text||"").join("");
+  }
+
+  async function colab(){
+    const r=await fetch(COLAB_URL.replace(/\/+$/,"")+"/chat",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","ngrok-skip-browser-warning":"1"},
+      body:JSON.stringify({
+        system:SYSTEM_PROMPT,
+        messages:hist.map(m=>({role:m[0]=="user"?"user":"assistant",content:m[1]}))
+      })
+    });
+    const d=await r.json();
+    if(!r.ok)throw new Error(d.error||r.status);
+    return d.reply??d.response??d.text??d.generated_text;
+  }
+
+  return{
+    reset(h){hist=h||[]},
+    async ask(t){
+      hist.push(["user",t]);
+      let out;
+      try{
+        if(GEMINI_API_KEY)out=await gemini();
+        else if(COLAB_URL)out=await colab();
+        else{await wait(1200+Math.random()*800);out=demo[Math.random()*demo.length|0]}
+        out=(out||"").trim();
+        if(!out)throw new Error("empty");
+      }catch(e){
+        console.error(e);
+        hist.pop();
+        return "Tớ chưa kết nối được với AI. Bạn kiểm tra lại API key hoặc đường dẫn Colab giúp tớ nhé.";
+      }
+      hist.push(["model",out]);
+      return out;
+    }
+  };
+})();
+
+</script>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const app=$("#app"),msgs=$("#msgs"),inp=$("#in");
+let sc=1,tt,first="bạn";
+const miss=[];
+if(typeof Login==="undefined"){miss.push("login.js");window.Login={signIn:()=>Promise.resolve({name:"Minh Anh",email:"minhanh.nguyen@gmail.com"}),signOut(){}}}
+if(typeof AI==="undefined"){miss.push("ai.js");window.AI={reset(){},ask:()=>new Promise(r=>setTimeout(()=>r("Tớ nghe đây 💙 Bạn kể thêm cho tớ nghe được không?"),1400))}}
+
+const bot=()=>`<svg viewBox="0 0 120 120"><g class="wl"><ellipse cx="26" cy="74" rx="24" ry="13" transform="rotate(-28 26 74)" fill="url(#gw)"/></g><g class="wr"><ellipse cx="94" cy="74" rx="24" ry="13" transform="rotate(28 94 74)" fill="url(#gw)"/></g><path d="M46 24L40 9M74 24L80 9" stroke="#a9ceff" stroke-width="3.5" stroke-linecap="round"/><circle cx="40" cy="8" r="5" fill="#5aa8ff"/><circle cx="80" cy="8" r="5" fill="#5aa8ff"/><ellipse cx="60" cy="90" rx="21" ry="18" fill="#e4eeff"/><circle cx="60" cy="54" r="34" fill="url(#gh)"/><circle cx="27" cy="56" r="7" fill="#4f93ff"/><circle cx="93" cy="56" r="7" fill="#4f93ff"/><rect x="34" y="39" width="52" height="31" rx="15.5" fill="url(#gv)"/><ellipse class="ey" cx="49" cy="55" rx="5" ry="6.5" fill="#6fe3ff"/><ellipse class="ey" cx="71" cy="55" rx="5" ry="6.5" fill="#6fe3ff"/><circle cx="50.5" cy="52" r="1.8" fill="#fff"/><circle cx="72.5" cy="52" r="1.8" fill="#fff"/><path d="M55 63q5 4 10 0" stroke="#6fe3ff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>`;
+const ico=n=>`<svg class="i"><use href="#i-${n}"/></svg>`;
+const paint=(r=document)=>r.querySelectorAll("[data-bot]:empty").forEach(e=>e.innerHTML=bot());
+const now=()=>new Date().toLocaleTimeString("vi-VN",{hour:"2-digit",minute:"2-digit"});
+
+function autoFit(){
+  app.style.height=innerHeight+"px";
+}
+function autoGrow(){
+  inp.style.height="auto";
+  inp.style.height=Math.min(inp.scrollHeight,110)+"px";
+}
+function toBottom(){msgs.scrollTo({top:msgs.scrollHeight,behavior:"smooth"})}
+function toast(m){const t=$("#ts");t.textContent=m;t.classList.add("on");clearTimeout(tt);tt=setTimeout(()=>t.classList.remove("on"),1900)}
+function closeAll(){["#dr","#sh","#dim"].forEach(s=>$(s).classList.remove("on"))}
+function go(id){$$(".scr").forEach(s=>s.classList.toggle("on",s.id===id));closeAll()}
+function open(s){$("#dim").classList.add("on");$(s).classList.add("on")}
+
+let busy=false;
+function typeInto(el,t,fx){
+  const a=[...t],n=Math.max(1,Math.round(a.length/160));
+  let i=0;
+  el.classList.add("cur");
+  (function step(){
+    i=Math.min(a.length,i+n);
+    el.textContent=a.slice(0,i).join("");
+    msgs.scrollTop=msgs.scrollHeight;
+    if(i>=a.length){el.classList.remove("cur");fx();return}
+    setTimeout(step,",.!?…\n".includes(a[i-1])?200:20+Math.random()*25);
+  })();
+}
+function add(who,t,fx){
+  const d=document.createElement("div");
+  d.className="m "+who;
+  d.innerHTML=(who=="bot"?'<span class="a" data-bot></span>':"")+`<div><div class="bb"></div><div class="tm">${now()}${who=="me"?" ✓✓":""}</div></div>`;
+  const bb=d.querySelector(".bb");
+  msgs.append(d);paint(d);
+  if(fx)typeInto(bb,t,fx);
+  else{bb.textContent=t;toBottom()}
+}
+function send(t){
+  t=(t||inp.value).trim();
+  if(!t||busy)return;
+  busy=true;
+  add("me",t);inp.value="";autoGrow();
+  const ty=document.createElement("div");
+  ty.className="m";
+  ty.innerHTML='<span class="a" data-bot></span><div class="bb dots"><i></i><i></i><i></i></div>';
+  msgs.append(ty);paint(ty);toBottom();
+  AI.ask(t).then(r=>{ty.remove();add("bot",r,()=>{busy=false})});
+}
+function seed(){
+  msgs.innerHTML="";AI.reset([["user","Tớ đang hơi mệt…"],["model","Tớ hiểu mà… Nếu bạn muốn, có thể kể cho tớ nghe. Tớ ở đây, không vội, không phán xét."]]);
+  add("bot",`Chào ${first}! 👋\nCó điều gì khiến bạn băn khoăn hôm nay không? Mình luôn sẵn sàng lắng nghe và trò chuyện cùng bạn.`);
+  if(guest){AI.reset([]);return}
+  setTimeout(()=>add("me","Tớ đang hơi mệt…"),500);
+  setTimeout(()=>add("bot","Tớ hiểu mà… 💙\nNếu bạn muốn, có thể kể cho tớ nghe. Mình sẽ ở đây, không vội, không phán xét."),1100);
+}
+function openChat(t){go("chat");if(t)setTimeout(()=>send(t),700)}
+
+const sugg=[["Trò chuyện tự do","chat","Mình trò chuyện tự do nhé!"],["Tâm sự cùng mình","heart","Tớ muốn tâm sự một chút…"],["Hỏi bất cứ điều gì","star","Tớ muốn hỏi bạn một điều…"]];
+$("#sg").innerHTML=sugg.map((s,i)=>`<button class="sc" data-s="${i}"><span class="ic">${ico(s[1])}</span>${s[0]}</button>`).join("");
+const convs=[["Cuộc trò chuyện mới","09:12","Bạn: Ừm, tớ đang suy nghĩ…","chat"],["Những điều nhỏ nhặt","Hôm qua","Bees AI: Không sao, bạn cứ từ từ…","heart"],["Ý tưởng và cảm hứng","Hôm qua","Bạn: Có thể gợi ý cho tớ vài ý tưởng…","star"],["Thế giới xung quanh","Thứ 3","Bees AI: Hôm nay thời tiết khá đẹp…","compass"]];
+$("#list").innerHTML=convs.map(c=>`<button class="cv"><span class="av">${ico(c[3])}</span><span class="tx"><b>${c[0]}<small>${c[1]}</small></b><p>${c[2]}</p></span></button>`).join("");
+
+$("#go").onclick=()=>open("#sh");
+$("#gg").onclick=()=>{
+  Login.signIn().then(u=>{
+    $("#ld").classList.add("on");
+    setTimeout(()=>{
+      setGuest(false);first=(u.name||"bạn").split(" ").pop();
+      $("#hi").textContent=`Chào ${first}!`;
+      $("#un").textContent=u.email||"Luôn ở đây, lắng nghe bạn";
+      seed();
+      $("#ld").classList.remove("on");
+      go("home");
+      setTimeout(()=>toast("Đã đăng nhập: "+u.name),600);
+    },1200);
+  }).catch(()=>toast("Chưa đăng nhập được, thử lại nhé"));
+};
+
+let guest=false;
+function setGuest(v){
+  guest=v;
+  app.classList.toggle("guest",v);
+  $("#ot").textContent=v?"Thoát chế độ khách":"Đăng xuất";
+}
+$("#gu").onclick=()=>{
+  closeAll();
+  setTimeout(()=>$("#wn").classList.add("on"),250);
+};
+$("#wb").onclick=()=>{
+  $("#wn").classList.remove("on");
+  setTimeout(()=>open("#sh"),250);
+};
+$("#wn").onclick=e=>{if(e.target.id=="wn")$("#wb").click()};
+$("#wc").onclick=()=>{
+  $("#wn").classList.remove("on");
+  setGuest(true);
+  first="bạn";
+  $("#hi").textContent="Chào bạn!";
+  $("#un").textContent="Chế độ khách";
+  seed();
+  go("home");
+  setTimeout(()=>toast("Đang dùng thử, chưa lưu lịch sử"),600);
+};
+addEventListener("beforeunload",e=>{if(guest&&msgs.querySelector(".m.me")){e.preventDefault();e.returnValue=""}});
+$("#menu").onclick=()=>open("#dr");
+$("#dim").onclick=closeAll;
+$("#new").onclick=()=>openChat();
+$("#bk").onclick=()=>go("home");
+$("#sn").onclick=()=>{send();inp.focus()};
+inp.addEventListener("input",autoGrow);
+inp.addEventListener("keydown",e=>{if(e.key=="Enter"&&!e.shiftKey){e.preventDefault();send()}});
+$$(".sc").forEach(b=>b.onclick=()=>openChat(sugg[b.dataset.s][2]));
+$$(".cv").forEach(b=>b.onclick=()=>openChat());
+$$("[data-soon]").forEach(b=>b.onclick=()=>toast("Sắp ra mắt ✨"));
+$$(".tab button").forEach(b=>b.onclick=()=>{
+  const t=b.dataset.t;
+  if(t=="chat")openChat();
+  else if(t=="me")open("#dr");
+  else toast("Sắp ra mắt ✨");
+});
+$$("#dr .it[data-a]").forEach(b=>b.onclick=()=>{
+  const a=b.dataset.a;
+  closeAll();
+  if(a=="chat")go("chat");
+  else if(a=="out"){Login.signOut();setGuest(false);go("splash")}
+  else if(a=="x")toast("Sắp ra mắt ✨");
+});
+$("#dk").onclick=()=>{const on=$("#dk .sw").classList.toggle("on");app.classList.toggle("light",!on)};
+
+document.addEventListener("pointerdown",e=>{
+  const b=e.target.closest("button");
+  if(!b)return;
+  const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*2/sc,s=document.createElement("i");
+  s.className="rip";
+  s.style.cssText=`width:${d}px;height:${d}px;left:${(e.clientX-r.left)/sc-d/2}px;top:${(e.clientY-r.top)/sc-d/2}px`;
+  b.append(s);setTimeout(()=>s.remove(),650);
+});
+
+for(let i=0;i<16;i++){
+  const b=document.createElement("i"),s=10+Math.random()*50;
+  b.className="bub";
+  b.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${10+Math.random()*14}s;animation-delay:-${Math.random()*20}s`;
+  document.body.append(b);
+}
+$$(".scr").forEach(s=>s.querySelectorAll(".st").forEach((e,i)=>e.style.setProperty("--i",i)));
+[...$("#dr").children].forEach((e,i)=>e.style.setProperty("--i",i));
+
+addEventListener("resize",autoFit);
+autoFit();paint();
+setTimeout(()=>go("splash"),60);
+seed();
+if(miss.length)setTimeout(()=>toast("Chưa thấy "+miss.join(" và ")+" cạnh file HTML, đang chạy bản thử"),1300);
+</script>
+</body>
+</html>
